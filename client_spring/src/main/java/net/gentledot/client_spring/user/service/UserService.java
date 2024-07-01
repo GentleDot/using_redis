@@ -3,20 +3,20 @@ package net.gentledot.client_spring.user.service;
 import io.micrometer.common.util.StringUtils;
 import net.gentledot.client_spring.user.model.User;
 import net.gentledot.client_spring.user.repository.UserRepository;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
+import java.time.Duration;
 import java.util.List;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final JedisPool jedisPool;
+    private final StringRedisTemplate redisTemplate;
 
-    public UserService(UserRepository userRepository, JedisPool jedisPool) {
+    public UserService(UserRepository userRepository, StringRedisTemplate redisTemplate) {
         this.userRepository = userRepository;
-        this.jedisPool = jedisPool;
+        this.redisTemplate = redisTemplate;
     }
 
     public boolean createAllUser(List<User> user) {
@@ -26,34 +26,19 @@ public class UserService {
 
     public String getUserEmail(Long id) {
         String result = "";
-//        return userRepository.findEmailById(id)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
+        String userEmailRedisKey = "users:%d:email".formatted(id);
 
-        /*
-        start
-        * 1. request to cache
-        * 2. miss -> request to db
-        * 3. cache
-        end
-        * */
-        try (Jedis redis = jedisPool.getResource()) {
-            String userEmailRedisKey = "users:%d:email".formatted(id);
-            String targetUserEmail = redis.get(userEmailRedisKey);
+        String targetUserEmail = redisTemplate.opsForValue().get(userEmailRedisKey);
 
-            if (StringUtils.isNotBlank(targetUserEmail)) {
-                return targetUserEmail;
-            }
-            String targetUserEmailData = userRepository.findEmailById(id)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
-//            redis.set(userEmailRedisKey, targetUserEmailData);
-            redis.setex(userEmailRedisKey, 30, targetUserEmailData); // TTL 30 seconds
-            result = targetUserEmailData;
-
-        } catch (Exception e) {
-            throw new RuntimeException("user not found.", e);
+        if (StringUtils.isNotEmpty(targetUserEmail)) {
+            return targetUserEmail;
         }
 
+        String targetUserEmailData = userRepository.findEmailById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        redisTemplate.opsForValue().set(userEmailRedisKey, targetUserEmailData, Duration.ofSeconds(30));
+        result = targetUserEmailData;
         return result;
     }
 }
