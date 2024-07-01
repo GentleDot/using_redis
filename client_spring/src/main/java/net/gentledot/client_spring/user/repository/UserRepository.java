@@ -1,6 +1,6 @@
 package net.gentledot.client_spring.user.repository;
 
-import net.gentledot.client_spring.user.model.User;
+import net.gentledot.client_spring.user.model.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

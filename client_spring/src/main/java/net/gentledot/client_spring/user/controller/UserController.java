@@ -1,5 +1,6 @@
 package net.gentledot.client_spring.user.controller;
 
+import net.gentledot.client_spring.user.model.domain.User;
 import net.gentledot.client_spring.user.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,11 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("{id}")
+    public User getUser(@PathVariable("id") Long id) {
+        return userService.getUser(id);
     }
 
     @GetMapping("{id}/email")
