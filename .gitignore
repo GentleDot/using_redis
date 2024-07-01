@@ -349,3 +349,6 @@ gradle-app.setting
 
 # imi file
 *.iml
+
+# application.yml / properties
+client_spring/src/main/resources/application.yml
