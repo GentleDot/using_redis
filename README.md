@@ -14,6 +14,8 @@
 - client_spring > user package 내 구현
 - redis 설정 : RedisConfig
 - redisHash 사용 : RedisHashUser
+- spring boot caching 사용 : CacheConfig
+  - https://docs.spring.io/spring-boot/reference/io/caching.html#io.caching.provider.redis
 
 ```yaml
 ├── java
@@ -23,6 +25,8 @@
 │               ├── ClientSpringApplication.java
 │               ├── common
 │               │   └── config
+│               │       ├── CacheConfig.java
+│               │       ├── CacheProperty.java
 │               │       ├── ObjectMapperConfig.java
 │               │       └── RedisConfig.java
 │               └── user
@@ -38,11 +42,10 @@
 │                   └── service
 │                       └── UserService.java
 └── resources
-└── application.yml
-
+    └── application.yml
 ```
 
-```
+```bash
 1719815895.983623 [0 172.17.0.1:59138] "GET" "users:1"
 1719815896.053465 [0 172.17.0.1:59138] "SETEX" "users:1" "30" "{\"id\":1,\"email\":\"tester1@example.com\",\"name\":\"tester1\",\"createdAt\":[2024,7,1,15,38,13,630846000],\"updatedAt\":[2024,7,1,15,38,13,630846000]}"
 1719816027.731835 [0 172.17.0.1:59138] "GET" "users:1"
@@ -81,4 +84,12 @@
 1719883661.761025 [0 172.17.0.1:59442] "HGETALL" "redis-hash-user:1"
 1719883662.322387 [0 172.17.0.1:59442] "HGETALL" "redis-hash-user:1"
 1719883662.833946 [0 172.17.0.1:59442] "HGETALL" "redis-hash-user:1"
+1719886598.688987 [0 172.17.0.1:59606] "HELLO" "3"
+1719886598.707960 [0 172.17.0.1:59606] "CLIENT" "SETINFO" "lib-name" "Lettuce"
+1719886598.707974 [0 172.17.0.1:59606] "CLIENT" "SETINFO" "lib-ver" "6.3.2.RELEASE/8941aea"
+1719886598.722551 [0 172.17.0.1:59606] "GET" "cache1::users:1"
+1719886598.774268 [0 172.17.0.1:59606] "SET" "cache1::users:1" "[\"net.gentledot.client_spring.user.model.domain.User\",{\"id\":1,\"email\":\"tester1@example.com\",\"name\":\"tester1\",\"createdAt\":[2024,7,2,11,16,27,356182000],\"updatedAt\":[2024,7,2,11,16,27,356182000]}]" "PX" "300000"
+1719886601.853174 [0 172.17.0.1:59606] "GET" "cache1::users:1"
+1719886602.581782 [0 172.17.0.1:59606] "GET" "cache1::users:1"
+1719886603.201460 [0 172.17.0.1:59606] "GET" "cache1::users:1"
 ```
