@@ -16,7 +16,7 @@ public class UserController {
 
     @GetMapping("{id}")
     public User getUser(@PathVariable("id") Long id) {
-        return userService.getUser(id);
+        return userService.getUserWithCache(id);
     }
 
     @PostMapping("{id}")

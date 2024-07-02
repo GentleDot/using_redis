@@ -352,3 +352,4 @@ gradle-app.setting
 
 # application.yml / properties
 client_spring/src/main/resources/application.yml
+/.idea/codeStyles/*
