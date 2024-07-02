@@ -11,6 +11,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
 public class RedisConfig {
@@ -18,6 +20,13 @@ public class RedisConfig {
 
     public RedisConfig(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+    }
+
+    @Bean
+    public JedisPool createJedisPool() {
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setJmxEnabled(false); // Disable JMX registration
+        return new JedisPool(poolConfig, "127.0.0.1", 6379);
     }
 
     @Bean
