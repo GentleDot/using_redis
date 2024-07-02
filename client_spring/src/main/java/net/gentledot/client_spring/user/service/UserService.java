@@ -14,12 +14,12 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final StringRedisTemplate stringRedisTemplate;
-    private final RedisTemplate<String, User> userRedisTemplate;
+    private final RedisTemplate<String, Object> objectRedisTemplate;
 
-    public UserService(UserRepository userRepository, StringRedisTemplate stringRedisTemplate, RedisTemplate<String, User> userRedisTemplate) {
+    public UserService(UserRepository userRepository, StringRedisTemplate stringRedisTemplate, RedisTemplate<String, Object> objectRedisTemplate) {
         this.userRepository = userRepository;
         this.stringRedisTemplate = stringRedisTemplate;
-        this.userRedisTemplate = userRedisTemplate;
+        this.objectRedisTemplate = objectRedisTemplate;
     }
 
     public boolean createAllUser(List<User> user) {
@@ -47,7 +47,7 @@ public class UserService {
 
     public User getUser(long id) {
         String userKey = "users:%d".formatted(id);
-        User user = userRedisTemplate.opsForValue()
+        User user = (User) objectRedisTemplate.opsForValue()
                 .get(userKey);
 
         if (user != null) {
@@ -57,7 +57,7 @@ public class UserService {
         User userData = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        userRedisTemplate.opsForValue().set(userKey, userData, Duration.ofSeconds(30));
+        objectRedisTemplate.opsForValue().set(userKey, userData, Duration.ofSeconds(30));
         return userData;
     }
 }
