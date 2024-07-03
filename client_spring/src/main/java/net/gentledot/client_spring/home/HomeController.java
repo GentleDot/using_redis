@@ -1,6 +1,7 @@
 package net.gentledot.client_spring.home;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Map;
 @RestController
 public class HomeController {
 
+    @GetMapping("/")
     public Map<String, String> home(HttpSession session) {
         String visitKey = "visits";
         Integer visits = (Integer) session.getAttribute(visitKey);
