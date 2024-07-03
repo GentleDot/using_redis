@@ -5,12 +5,15 @@ import net.gentledot.client_spring.user.model.domain.RedisHashUser;
 import net.gentledot.client_spring.user.model.domain.User;
 import net.gentledot.client_spring.user.repository.RedisHashUserRepository;
 import net.gentledot.client_spring.user.repository.UserRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
+
+import static net.gentledot.client_spring.common.config.CacheConfig.CACHE1;
 
 @Service
 public class UserService {
@@ -73,5 +76,11 @@ public class UserService {
                     User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
                     return redisHashUserRepository.save(RedisHashUser.from(user));
                 });
+    }
+
+    @Cacheable(cacheNames = CACHE1, key = "'users:' + #id")
+    public User getUserWithCache(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
